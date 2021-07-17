@@ -1,0 +1,300 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+
+
+
+
+## Acknowledgement
+
+We would like to express our gratitude towards **Mr.Umair Durrani**  of **St. Clair College** for his support in accomplishment of our project on **Nuclear Explsions**.
+
+
+
+I would like to extend my deep appreciation to all my group members, without their support and coordination we would not have been able to complete this project.
+
+
+Everyone had equally contributed on this project we have divide the work equally among overselves and worked hard for the outcome and  completed the project with a proper outcome
+
+
+
+
+
+## Versions of R and Rstudio
+
+
+version of :R "version 4.1.0 (2021-05-18)" and R studio: "Version 1.4.1106"
+
+
+
+## List of R packages used and their versions :
+
+1. plotly    version :‘4.9.3’
+2. tiyverse  version :‘1.3.1’
+3. dplyr     version :‘1.0.6’
+4. ggthemes  version :‘4.2.4’
+5. Maps      version :‘3.3.0’
+6. scales    version :‘1.1.1’
+7. gganimate version :‘1.0.7’
+
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(ggthemes)
+library(maps)
+library(scales)
+library(ggplot2)
+library(gganimate)
+library(tvthemes)
+```
+
+
+
+
+## Documentation of the data sets:
+
+
+i. This data is from Stockholm International Peace Research Institute, by way of data is plural with credit to Jesus Castagnetto for sharing the dataset.
+
+ii. link :https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-08-20
+
+iii. This data shows how each country has used their nuclear explosions from the year 1945 to 1998.
+
+
+## Loading The DATA of Nuclear Explosions
+
+
+```{r}
+nuclear_explosions <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-08-20/nuclear_explosions.csv")
+
+nuclear_explosions
+view(nuclear_explosions)
+```
+
+
+
+## Showing the PLOTS
+
+### Two plots displaying the distribution of a single continuous variable
+
+#### PLOT 1 A
+
+```{r}
+ggplot(nuclear_explosions,aes(magnitude_body))+
+  geom_density(aes(fill=country)) +
+  labs(
+    title = "Explosion waves with magnitude of a body",
+    x = "Magnitude of a body", 
+    y = "Explosion Density",
+    caption = "\n Magnitude of body while explosino in different country                                                          ") 
+
+```
+
+
+
+
+#### PLOT 1B
+
+```{r}
+s= ggplot(nuclear_explosions,aes(magnitude_surface, purpose))+
+  geom_col(aes(fill=country)) +
+  labs(
+    title = "Country with purpose of explosion and it's surface of magnitude",
+    x = "Magnitude of a surface", 
+    y = "Purpose ",
+    caption = " \n  Mostly surface of magnitude was disturbed in  WR Weapons development program") 
+
+ggplotly(s)
+```
+
+
+
+
+
+
+### Two plots displaying information about a single categorical variable
+
+#### PLOT 2A
+
+```{r fig.height = 8}
+
+  ggplot(nuclear_explosions)+
+  geom_bar(
+    mapping = aes(
+      x = type
+      ),color= "red", fill = "skyblue") +
+  labs(
+    title = "Distribution of countries to which different types of explosions were used",
+    x = "Type of Bomb ", 
+    y = "Number of explosions",
+    caption = "\n USA and USSR are the most targeted countries for nuclear explosions and the SHAFT type is most used explosive method                                                                                                                                                                       ") +
+  coord_flip() +
+  facet_wrap(~country, nrow = 2)
+```
+
+
+
+
+
+#### PLOT 2B
+```{r}
+
+ggplot(nuclear_explosions, aes(year, fill = country)) + 
+  geom_histogram(binwidth = 5, position = "dodge") +
+  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+  scale_x_continuous(limits = c(1945, 2000),
+                     breaks = seq(1945, 2000, by = 5)) +
+  labs(
+    title = "Nuclear Explosions",
+   y = "No of Explosions",
+    caption = "\n Most of the explosions are done by the USA and USSR over a given period of the year.               "
+  ) 
+```
+
+
+
+
+### one plot displaying information about both a continuous variable and a categorical variable
+
+#### PLOT 3
+```{r}
+ggplot(nuclear_explosions)+
+  geom_point(mapping =aes(x = year,y = type), colour = "red") +
+  labs(
+    title = "Type of explosions, 1945 - 1998",
+    
+    caption = "\n we can see that there is a rise in the under ground activity form the year 1980                          \n"
+  ) 
+```
+
+
+
+
+
+
+### Two plots should display information that shows a relationship between two variables
+
+#### PLOT 4 A
+```{r fig.height=6}
+world_map <- map_data("world")
+
+maps <-ggplot() +
+  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), fill = NA, color = "grey") +
+  geom_point(data = nuclear_explosions, aes(x = longitude, y = latitude, size = (yield_upper + yield_lower)/2, color = country)) +
+  theme_economist_white() +
+  theme(legend.position = "right")+
+  labs(
+    title = "Map showing the Postion of the Explosions",
+   x = "Latitude",
+   y= "longitude"
+  ) 
+
+ggplotly(maps)
+```
+
+
+
+
+
+#### PLOT 4B
+
+```{r}
+cc<-ggplot(nuclear_explosions, aes(year, purpose, color = country))+
+  geom_point()+
+  labs(
+    title = "Map showing the Postion of the Explosions",
+   x = "Latitude",
+   y= "longitude",
+   caption = " Showing the year with particular purposes of explosion                      "
+  ) 
+
+ggplotly(cc)
+```
+
+
+
+
+### one plot should use faceting and display information about 4 variables
+
+
+#### PLOT 5
+
+```{r}
+pp <-ggplot(nuclear_explosions)+
+  geom_point(mapping = aes(x= id_no,y= year ,color = type, label = name)) +
+facet_wrap(~country, ncol = 2)+
+  labs(
+    title="Names and ID No of a Nuclear Explosions for Particular countries",
+    x = "Id Number",
+    y = "Year"
+  )
+
+ggplotly(pp)
+```
+
+
+
+
+### competition plot: an opportunity to explore what’s possible and get creative
+
+#### PLOT 6 (ANIMATION)
+
+```{r fig.height = 7}
+ggplot(nuclear_explosions,aes(type,purpose,color=country))+
+  geom_jitter(alpha=0.8)+xlab("Type")+ylab("Purpose")+
+  ggtitle("Purpose vs Type for Nuclear Missiles",subtitle = "By Country")+
+  labs(caption="Animations showing the types that have used in the purpose of the explosion")+ transition_states(country)+
+  theme_simpsons()+scale_color_simpsons()+
+  theme(axis.text.x = element_text(angle=60,hjust=1))
+```
+
+
+
+
+## REFERENCES
+
+- https://github.com/Niketh27/Niketh_DistillSite/tree/f0610d8fadfdd200bc56143fa63ee7e12f22d0ba/_posts
+- https://gganimate.com/articles/gganimate.html
+
+
+
+
+## Answering to the following questions:
+
+
+### 1.In what ways do you think data visualization is important to understanding a data set?
+
+#### Ans) Data visualization gives us a clear idea of what the information means by giving it visual context through maps or graphs. This makes the data more natural for the human mind to comprehend and therefore makes it easier to identify trends, patterns, and outliers within large data sets.Specifically, data visualization uses visual data to communicate information in a manner that is universal, fast, and effective.
+
+
+
+
+### 2. In what ways do you think data visualization is important to communicating important aspects of a data set?
+
+#### Ans) Data visulalization positively affects an organizations decision making process with an interactive visual information of data. we can easily grasp information through visualization.In a business context visualization helps convey a story to decision makers allowing them to act more quicky. For handling large amount of data a  in pictorial format to provide a sumary of unseen patterns in the data ,revealing insights and the story behind the data to establish a busiess goal .
+
+
+
+
+### 3. What role does your integrity as an analyst play when creating a data visualization for communicating results to others?
+
+#### Ans) As a data analyst must be care ful to design our data visualization with true visual integrity to ensure that the information being presented us viewed as credible  both literally and figuratively to other mates
+
+
+
+
+### 4)How many variables do you think you can successfully represent in a visualization? What happens when you exceed this number?
+
+#### Ans) I think four variables can be represented successfully for any visulalizationif we exceed the number We can’t make all possible comparisons in a single instant — we must toggle between comparisons in our mind, building a understanding of each in turn.The challenge of envisioning the information would be amplified if the visualization depicted more data. For example, if we wanted to show all five of the racial groups (for a total of 1,000 points) we would probably have major issues with marks occluding other marks. And what if we wanted to depict a fifth variable, how would we visually encode it ? Would we use size, texture, color intensity? We could use one of these visual variables to create an even more dense multivariate visualization. Alternatively, we could take a good design that depicts two or three variables and multiply it.
+  
+  
+  
+  
+  
+  
